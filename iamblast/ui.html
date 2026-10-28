@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IAM Blast Radius</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#14181f;--mute:#5d6674;--line:#e2e5ea;--accent:#2a5bd7;
+ --severe:#b3261e;--high:#c2410c;--medium:#a16207;--low:#0e7490;--ok:#157f4b;--chip:#eef1f5;}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1218;--panel:#171b23;--ink:#e8ebf0;--mute:#98a1b0;--line:#2a303b;--accent:#7aa2ff;
+ --severe:#ff8a80;--high:#fb923c;--medium:#facc15;--low:#22d3ee;--ok:#5fd39a;--chip:#232936;}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:14px 24px;background:var(--panel);border-bottom:1px solid var(--line)}
+header h1{font-size:17px;margin:0;font-weight:650}.badges{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-size:12px;padding:2px 9px;border:1px solid var(--line);border-radius:999px;color:var(--mute);background:var(--bg)}
+main{display:grid;grid-template-columns:320px 1fr;gap:20px;padding:20px 24px;max-width:1360px;margin:auto}
+@media(max-width:960px){main{grid-template-columns:1fr;padding:16px}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.card h2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:0 0 10px;font-weight:600}
+label{display:block;font-size:12px;color:var(--mute);margin:8px 0 3px}
+select,textarea,input,button{font:inherit;color:var(--ink)}
+select,textarea,input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px}
+textarea{height:110px;font:12px/1.4 ui-monospace,Menlo,monospace}
+button{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:8px 14px;font-weight:600;cursor:pointer;margin-top:10px;width:100%}
+button.sec{background:var(--chip);color:var(--ink);font-weight:500;margin-top:6px}
+button:disabled{opacity:.5;cursor:wait}
+.hist{list-style:none;margin:0;padding:0}.hist li{display:flex;gap:8px;align-items:center;padding:7px 6px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:6px}
+.hist li:hover,.hist li.sel{background:var(--bg)}.hist .t{margin-left:auto;color:var(--mute);font-size:12px}
+.pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;text-transform:uppercase;white-space:nowrap}
+.p-critical,.l-severe{background:color-mix(in srgb,var(--severe) 16%,transparent);color:var(--severe)}
+.p-needs_attention,.l-high{background:color-mix(in srgb,var(--high) 16%,transparent);color:var(--high)}
+.l-medium{background:color-mix(in srgb,var(--medium) 18%,transparent);color:var(--medium)}
+.p-healthy,.l-low{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.banner{display:flex;gap:16px;align-items:center;padding:16px 18px;border-radius:10px;margin-bottom:16px;border:1px solid var(--line);background:var(--panel)}
+.banner .big{font-size:22px;font-weight:750}.b-critical .big{color:var(--severe)}.b-needs_attention .big{color:var(--high)}.b-healthy .big{color:var(--ok)}
+.stats{display:flex;gap:16px;flex-wrap:wrap;color:var(--mute);font-size:13px}.stats b{color:var(--ink)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}@media(max-width:1100px){.grid2{grid-template-columns:1fr}}
+svg#map{width:100%;height:430px;background:var(--bg);border-radius:8px;border:1px solid var(--line)}
+.node{cursor:pointer}.node text{font-size:10px;fill:var(--ink);pointer-events:none}
+.lvl-severe{fill:var(--severe)}.lvl-high{fill:var(--high)}.lvl-medium{fill:var(--medium)}.lvl-low{fill:var(--ok)}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--mute);margin-top:8px;flex-wrap:wrap}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:5px 6px;text-align:left;border-bottom:1px solid var(--line)}
+tr.row{cursor:pointer}tr.row:hover,tr.row.sel{background:var(--bg)}
+.bar{height:8px;background:var(--line);border-radius:4px;position:relative;min-width:60px}.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.bar .d{opacity:.45}
+.chips{display:flex;flex-wrap:wrap;gap:5px}.chip{font-size:11px;padding:1px 7px;border-radius:4px;background:var(--chip);color:var(--mute)}.chip.gain{background:color-mix(in srgb,var(--severe) 16%,transparent);color:var(--severe);font-weight:600}.chip.own{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.path{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0;font-size:12px}.path .n{padding:3px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);font-family:ui-monospace,Menlo,monospace}
+.path .a{color:var(--mute);max-width:260px;font-size:11px}
+.finding{border-left:4px solid var(--medium);padding:8px 12px;margin:10px 0;background:var(--bg);border-radius:0 8px 8px 0}
+.finding.critical{border-color:var(--severe)}.finding.high{border-color:var(--high)}.finding.low{border-color:var(--low)}.finding.info{border-color:var(--mute)}
+.sev{font-size:11px;font-weight:700;text-transform:uppercase}.ev{font:11px ui-monospace,Menlo,monospace;color:var(--mute);word-break:break-all}
+.cmd{font:11px ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin:4px 0;word-break:break-all}
+.fix{border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0}
+.warn{background:color-mix(in srgb,var(--medium) 16%,transparent);color:var(--medium);padding:8px 12px;border-radius:8px;margin-bottom:10px;font-size:13px}
+.m{color:var(--mute);font-size:13px}.err{color:var(--severe);margin-top:8px;font-size:13px}.empty{color:var(--mute);padding:40px;text-align:center}
+.tr{display:flex;gap:8px;font-size:12px;align-items:center;margin:2px 0}.tr .l{width:170px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tr .t{flex:1;height:9px;background:var(--bg);border-radius:5px;position:relative}.tr .f{position:absolute;height:100%;background:var(--accent);border-radius:5px;min-width:3px}.tr .f.e{background:var(--severe)}
+</style>
+</head>
+<body>
+<header><h1>IAM Blast Radius</h1><span class="badge">who can become what, with fixes verified by simulation</span><div class="badges" id="badges"></div></header>
+<main>
+<aside>
+ <div class="card"><h2>Analyze</h2>
+  <label for="sample">Sample snapshot</label><select id="sample"></select>
+  <label for="snap">Snapshot JSON (<code>iamblast collect</code>)</label><textarea id="snap" spellcheck="false"></textarea>
+  <div id="livebox" style="display:none"><label for="live">Live project (read-only)</label><select id="live"></select></div>
+  <label for="llm">Model</label><select id="llm"></select>
+  <button id="run">Analyze snapshot</button><button id="runlive" class="sec" style="display:none">Analyze live project</button>
+  <div class="err" id="err"></div></div>
+ <div class="card"><h2>Recent analyses</h2><ul class="hist" id="hist"></ul></div>
+</aside>
+<section id="out"><div class="card empty">Choose a sample snapshot and run an analysis.</div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const short=p=>p.replace(/^serviceAccount:/,"sa:").replace(/@[a-z0-9-]+\.iam\.gserviceaccount\.com$/,"@…");
+const PL={critical:"Critical",needs_attention:"Needs attention",healthy:"Healthy"};
+let cfg={},cur=null,sel=null;
+async function api(p,o){const r=await fetch(p,o);const b=await r.json().catch(()=>({}));if(!r.ok)throw new Error(b.detail||r.statusText);return b}
+async function badges(){cfg=await api("/api/config");$("badges").innerHTML=`<span class="badge">${cfg.roles_in_catalog} roles classified</span><span class="badge">model: ${esc(cfg.provider)}${cfg.model?" / "+esc(cfg.model):""}</span><span class="badge">spend $${cfg.spend_today_usd.toFixed(4)} / $${cfg.daily_budget_usd.toFixed(2)}</span>`}
+async function init(){
+ await badges();
+ $("llm").innerHTML=cfg.allowed_providers.map(p=>`<option ${p===cfg.provider?"selected":""}>${esc(p)}</option>`).join("");
+ const names=await api("/api/samples");$("sample").innerHTML=`<option value="">-- choose --</option>`+names.map(n=>`<option>${esc(n)}</option>`).join("");
+ $("sample").onchange=async()=>{if($("sample").value)$("snap").value=JSON.stringify(await api("/api/samples/"+$("sample").value),null,1)};
+ if(cfg.live_projects.length){$("livebox").style.display="";$("runlive").style.display="";$("live").innerHTML=cfg.live_projects.map(p=>`<option>${esc(p)}</option>`).join("")}
+ $("run").onclick=()=>run({snapshot:JSON.parse($("snap").value||"null")});
+ $("runlive").onclick=()=>run({live_project:$("live").value});
+ await hist();const h=location.hash.slice(1);if(h)show(await api("/api/analyses/"+h));
+}
+async function hist(){const rows=await api("/api/analyses?limit=15");
+ $("hist").innerHTML=rows.map(r=>`<li data-id="${esc(r.id)}" class="${cur===r.id?"sel":""}"><span class="pill p-${r.posture}">${PL[r.posture]}</span><span>${esc(r.project)}</span><span class="t">${esc(r.created_at.slice(11,19))}</span></li>`).join("")||`<li style="cursor:default;color:var(--mute)">none yet</li>`;
+ document.querySelectorAll("#hist li[data-id]").forEach(li=>li.onclick=async()=>show(await api("/api/analyses/"+li.dataset.id)))}
+async function run(body){$("err").textContent="";body.llm=$("llm").value;
+ for(const b of [$("run"),$("runlive")])b.disabled=true;
+ try{const a=await api("/api/analyses",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});sel=null;show(a);await hist();await badges()}
+ catch(e){$("err").textContent=e.message.includes("JSON")?"Snapshot is not valid JSON.":e.message}
+ finally{for(const b of [$("run"),$("runlive")])b.disabled=false}}
+
+function layout(g,W,H){const N=g.nodes.map((n,i)=>({...n,x:W/2+Math.cos(i*2.4)*Math.min(W,H)*.35,y:H/2+Math.sin(i*2.4)*Math.min(W,H)*.35,vx:0,vy:0}));
+ const idx=Object.fromEntries(N.map(n=>[n.id,n]));const E=g.edges.map(e=>({a:idx[e.source],b:idx[e.target],e})).filter(x=>x.a&&x.b);
+ for(let it=0;it<260;it++){const t=1-it/260;
+  for(const a of N)for(const b of N)if(a!==b){let dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy+.1,f=2600/d2;a.vx+=dx*f;a.vy+=dy*f}
+  for(const {a,b} of E){const dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)||1,f=(d-110)*.02;a.vx+=dx/d*f;a.vy+=dy/d*f;b.vx-=dx/d*f;b.vy-=dy/d*f}
+  for(const a of N){a.vx+=(W/2-a.x)*.004;a.vy+=(H/2-a.y)*.004;a.x=Math.max(30,Math.min(W-30,a.x+a.vx*t));a.y=Math.max(20,Math.min(H-20,a.y+a.vy*t));a.vx*=.6;a.vy*=.6}}
+ return {N,E}}
+
+function show(a){cur=a.id;location.hash=a.id;const S=a.reaches;sel=sel&&S.find(r=>r.principal===sel)?sel:(S[0]||{}).principal;
+ const W=720,H=430,{N,E}=layout(a.graph,W,H);
+ const map=`<svg id="map" viewBox="0 0 ${W} ${H}"><defs><marker id="ar" viewBox="0 0 8 8" refX="14" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L8,4L0,8z" fill="#888"/></marker></defs>`+
+  E.map(({a,b,e})=>`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#888" stroke-opacity=".5" marker-end="url(#ar)"><title>${esc(short(e.source))} → ${esc(short(e.target))}: ${esc(e.how)}</title></line>`).join("")+
+  N.map(n=>`<g class="node" data-p="${esc(n.id)}" transform="translate(${n.x},${n.y})"><circle r="${6+n.score/9}" class="lvl-${n.level}" stroke="${n.id===sel?"var(--ink)":"none"}" stroke-width="2.5"><title>${esc(n.id)} · score ${n.score}</title></circle><text y="${-10-n.score/9}" text-anchor="middle">${esc(short(n.id).slice(0,24))}</text></g>`).join("")+`</svg>`;
+ const rows=S.map(r=>`<tr class="row ${r.principal===sel?"sel":""}" data-p="${esc(r.principal)}"><td>${esc(short(r.principal))}</td><td><div class="bar"><i class="l-${r.level}" style="width:${r.score}%;background:currentColor"></i><i style="width:${r.direct_score}%;background:var(--ink);opacity:.35;height:3px;top:2px"></i></div></td><td>${r.score}</td></tr>`).join("");
+ const r=S.find(x=>x.principal===sel);
+ const detail=r?`<h2>${esc(r.principal)}</h2><div class="stats"><span>blast radius <b>${r.score}/100</b></span><span>direct <b>${r.direct_score}</b></span><span>reaches <b>${r.reachable.length}</b> service account(s)</span></div>
+  <div class="chips" style="margin:8px 0">${r.direct_caps.map(c=>`<span class="chip own">${esc(c)}</span>`).join("")}${r.gained_caps.map(c=>`<span class="chip gain">+${esc(c)}</span>`).join("")}</div>
+  ${Object.entries(r.paths).slice(0,4).map(([t,hops])=>`<div class="path">${[`<span class="n">${esc(short(r.principal))}</span>`].concat(hops.map(h=>`<span class="a">→ ${esc(h.how)} [${esc(h.binding.role)}] →</span><span class="n">${esc(short(h.target))}</span>`)).join("")}</div>`).join("")||`<div class="m">Cannot become any service account.</div>`}`:"";
+ const fnd=a.findings.map(f=>`<div class="finding ${f.severity}"><span class="sev">${f.severity}</span> <span class="chip">${esc(f.id)}</span> <b>${esc(f.title)}</b>${f.detail?`<div class="m">${esc(f.detail)}</div>`:""}${f.evidence.slice(0,3).map(e=>`<div class="ev">${esc(e)}</div>`).join("")}${f.note?`<div style="margin-top:4px"><b>${esc(a.provider)} note:</b> ${esc(f.note)}</div>`:""}</div>`).join("");
+ const fixes=a.fixes.map(v=>`<div class="fix"><span class="chip">${esc(v.finding_id)}</span> <span class="chip">${v.origin==="llm"?"model-proposed, verified":"rule-based"}</span> <b>${v.patch.op==="replace"?`replace ${esc(v.patch.role)} → ${esc(v.patch.new_role)}`:`remove ${esc(v.patch.role)}`}</b> on ${esc(short(v.patch.member))}
+   <div class="m">${esc(v.reason)}${v.rationale?` — ${esc(v.rationale)}`:""}</div>${v.commands.map(c=>`<div class="cmd">${esc(c)}</div>`).join("")}</div>`).join("");
+ const tot=Math.max(a.duration_ms,1),tr=a.trace.filter(s=>s.status!=="skipped").map(s=>`<div class="tr"><span class="l">${esc(s.agent)} · ${esc(s.action)}</span><span class="t"><span class="f ${s.status==="error"?"e":""}" style="left:${(s.start_ms/tot*100).toFixed(1)}%;width:${Math.max(s.duration_ms/tot*100,.5).toFixed(1)}%"></span></span><span class="m">${s.duration_ms} ms</span></div>`).join("");
+ $("out").innerHTML=`<div class="banner b-${a.posture}"><div><div class="big">${PL[a.posture].toUpperCase()}</div><div class="stats"><span><b>${esc(a.project)}</b></span><span><b>${a.reaches.length}</b> principals</span><span><b>${a.findings.length}</b> findings</span><span><b>${a.fixes.length}</b> verified fixes</span><span>${esc(a.provider)} / ${esc(a.model)}</span><span>$${a.cost_usd.toFixed(5)}</span><span>${a.duration_ms} ms</span></div></div></div>
+ <div class="card"><h2>Summary</h2>${esc(a.summary)}</div>${a.degraded.map(d=>`<div class="warn">⚠ ${esc(d)}</div>`).join("")}
+ <div class="card"><h2>Blast map — who can become whom</h2>${map}<div class="legend"><span><i class="dot lvl-severe"></i>severe ≥70</span><span><i class="dot lvl-high"></i>high ≥40</span><span><i class="dot lvl-medium"></i>medium ≥20</span><span><i class="dot lvl-low" style="background:var(--ok)"></i>low</span><span>arrows: identity can become a service account (Owner/Editor holders omitted; see IAM003)</span></div></div>
+ <div class="grid2"><div class="card"><h2>Blast radius by principal</h2><table><tbody>${rows}</tbody></table></div><div class="card">${detail}</div></div>
+ <div class="card"><h2>Findings (${a.findings.length})</h2>${fnd||"<div class='m'>None.</div>"}${a.unclassified_roles.length?`<div class="m">Unclassified roles (not scored): ${a.unclassified_roles.map(esc).join(", ")}</div>`:""}</div>
+ <div class="card"><h2>Verified fixes — each re-simulated before it is shown</h2>${fixes||"<div class='m'>No fixes proposed.</div>"}${a.dropped.length?`<h2 style="margin-top:14px">Rejected</h2>`+a.dropped.map(d=>`<div class="m">✗ ${esc(d.item)} — ${esc(d.reason)}</div>`).join(""):""}</div>
+ <div class="card"><h2>Orchestration</h2>${tr}</div>`;
+ document.querySelectorAll("[data-p]").forEach(el=>el.onclick=()=>{sel=el.dataset.p;show(a)});
+ document.querySelectorAll("#hist li").forEach(li=>li.classList.toggle("sel",li.dataset.id===a.id))}
+init().catch(e=>{$("err").textContent=e.message});
+</script>
+</body>
+</html>

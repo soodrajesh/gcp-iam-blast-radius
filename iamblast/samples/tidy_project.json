@@ -1,0 +1,51 @@
+{
+ "project": "tidy-co",
+ "collected_at": "2026-10-28T00:00:00Z",
+ "internal_domains": [
+  "tidy.io"
+ ],
+ "service_accounts": [
+  {
+   "email": "api@tidy-co.iam.gserviceaccount.com",
+   "disabled": false,
+   "keys": []
+  },
+  {
+   "email": "jobs@tidy-co.iam.gserviceaccount.com",
+   "disabled": false,
+   "keys": []
+  }
+ ],
+ "bindings": [
+  {
+   "scope": "project",
+   "role": "roles/resourcemanager.projectIamAdmin",
+   "member": "group:admins@tidy.io"
+  },
+  {
+   "scope": "project",
+   "role": "roles/viewer",
+   "member": "user:ann@tidy.io"
+  },
+  {
+   "scope": "project",
+   "role": "roles/datastore.user",
+   "member": "serviceAccount:api@tidy-co.iam.gserviceaccount.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/logging.logWriter",
+   "member": "serviceAccount:api@tidy-co.iam.gserviceaccount.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/bigquery.dataViewer",
+   "member": "serviceAccount:jobs@tidy-co.iam.gserviceaccount.com"
+  },
+  {
+   "scope": "sa:api@tidy-co.iam.gserviceaccount.com",
+   "role": "roles/iam.serviceAccountUser",
+   "member": "user:ann@tidy.io"
+  }
+ ]
+}

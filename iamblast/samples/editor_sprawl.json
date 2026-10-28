@@ -1,0 +1,56 @@
+{
+ "project": "startup-1",
+ "collected_at": "2026-10-28T00:00:00Z",
+ "internal_domains": [
+  "startup.dev"
+ ],
+ "service_accounts": [
+  {
+   "email": "111-compute@developer.gserviceaccount.com",
+   "disabled": false,
+   "keys": [
+    {
+     "type": "USER_MANAGED",
+     "age_days": 400
+    }
+   ]
+  },
+  {
+   "email": "admin-sa@startup-1.iam.gserviceaccount.com",
+   "disabled": false,
+   "keys": []
+  }
+ ],
+ "bindings": [
+  {
+   "scope": "project",
+   "role": "roles/owner",
+   "member": "user:cto@startup.dev"
+  },
+  {
+   "scope": "project",
+   "role": "roles/editor",
+   "member": "user:dev1@startup.dev"
+  },
+  {
+   "scope": "project",
+   "role": "roles/editor",
+   "member": "user:dev2@startup.dev"
+  },
+  {
+   "scope": "project",
+   "role": "roles/editor",
+   "member": "user:dev3@startup.dev"
+  },
+  {
+   "scope": "project",
+   "role": "roles/editor",
+   "member": "serviceAccount:111-compute@developer.gserviceaccount.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/owner",
+   "member": "serviceAccount:admin-sa@startup-1.iam.gserviceaccount.com"
+  }
+ ]
+}

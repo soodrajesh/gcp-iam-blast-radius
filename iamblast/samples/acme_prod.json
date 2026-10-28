@@ -1,0 +1,136 @@
+{
+ "project": "acme-prod",
+ "collected_at": "2026-10-28T00:00:00Z",
+ "internal_domains": [
+  "acme.com"
+ ],
+ "service_accounts": [
+  {
+   "email": "ci-deployer@acme-prod.iam.gserviceaccount.com",
+   "disabled": false,
+   "keys": [
+    {
+     "type": "USER_MANAGED",
+     "age_days": 210
+    }
+   ]
+  },
+  {
+   "email": "terraform@acme-prod.iam.gserviceaccount.com",
+   "disabled": false,
+   "keys": []
+  },
+  {
+   "email": "orders-app@acme-prod.iam.gserviceaccount.com",
+   "disabled": false,
+   "keys": []
+  },
+  {
+   "email": "etl@acme-prod.iam.gserviceaccount.com",
+   "disabled": false,
+   "keys": []
+  },
+  {
+   "email": "123456789-compute@developer.gserviceaccount.com",
+   "disabled": false,
+   "keys": []
+  },
+  {
+   "email": "legacy-batch@acme-prod.iam.gserviceaccount.com",
+   "disabled": true,
+   "keys": []
+  }
+ ],
+ "bindings": [
+  {
+   "scope": "project",
+   "role": "roles/owner",
+   "member": "user:alice@acme.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/run.developer",
+   "member": "user:bob@acme.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/iam.serviceAccountUser",
+   "member": "user:bob@acme.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/viewer",
+   "member": "user:carol@acme.com"
+  },
+  {
+   "scope": "sa:ci-deployer@acme-prod.iam.gserviceaccount.com",
+   "role": "roles/iam.serviceAccountTokenCreator",
+   "member": "user:carol@acme.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/storage.admin",
+   "member": "user:eve@gmail.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/editor",
+   "member": "group:platform@acme.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/cloudbuild.builds.editor",
+   "member": "serviceAccount:ci-deployer@acme-prod.iam.gserviceaccount.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/run.admin",
+   "member": "serviceAccount:ci-deployer@acme-prod.iam.gserviceaccount.com"
+  },
+  {
+   "scope": "sa:terraform@acme-prod.iam.gserviceaccount.com",
+   "role": "roles/iam.serviceAccountTokenCreator",
+   "member": "serviceAccount:ci-deployer@acme-prod.iam.gserviceaccount.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/owner",
+   "member": "serviceAccount:terraform@acme-prod.iam.gserviceaccount.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/secretmanager.secretAccessor",
+   "member": "serviceAccount:orders-app@acme-prod.iam.gserviceaccount.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/datastore.user",
+   "member": "serviceAccount:orders-app@acme-prod.iam.gserviceaccount.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/bigquery.dataEditor",
+   "member": "serviceAccount:etl@acme-prod.iam.gserviceaccount.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/editor",
+   "member": "serviceAccount:123456789-compute@developer.gserviceaccount.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/storage.objectAdmin",
+   "member": "serviceAccount:legacy-batch@acme-prod.iam.gserviceaccount.com"
+  },
+  {
+   "scope": "project",
+   "role": "roles/storage.objectViewer",
+   "member": "allUsers"
+  },
+  {
+   "scope": "project",
+   "role": "roles/custom.dbOperator",
+   "member": "user:dave@acme.com"
+  }
+ ]
+}
