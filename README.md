@@ -37,6 +37,12 @@ Trust split: code decides severity, posture and which fixes are valid. Models on
 | Verified fix | remove `serviceAccountUser` from bob: total blast radius 803 -> 718 |
 | Command | `gcloud projects remove-iam-policy-binding ...` (narrower role is added before the old one is removed) |
 
+## Architecture
+
+[![Architecture: private Cloud Run service, engine, read-only sources, optional Gemini, up.sh delivery](docs/img/architecture.png)](docs/img/architecture.svg)
+
+Regenerate with `python3 docs/diagrams/architecture.py` then `python3 docs/diagrams/render.py docs/img/architecture.svg docs/img/architecture.png` (needs Playwright).
+
 ## Quick start (local)
 
 ```bash

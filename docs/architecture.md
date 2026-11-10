@@ -1,5 +1,7 @@
 # Architecture
 
+[![Architecture diagram](img/architecture.png)](img/architecture.svg)
+
 **Collection** (`collector.py`): four read-only REST calls with Application Default Credentials:
 project `getIamPolicy` (v3, so conditions stay conditions), service-account list, each SA's
 `getIamPolicy`, each SA's user-managed keys. The result is a `Snapshot`; its SHA-256 is all that is
